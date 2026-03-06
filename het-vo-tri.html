@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hết Vô Tri</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-dim: #8a6f32;
+    --ink: #0e0c08;
+    --parchment: #f5f0e8;
+    --smoke: #1a1710;
+    --mist: rgba(201,168,76,0.12);
+    --danger: #c0392b;
+    --good: #27ae60;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--ink);
+    color: var(--parchment);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 999;
+    opacity: 0.4;
+  }
+
+  /* ========= SCREENS ========= */
+  .screen {
+    display: none;
+    min-height: 100vh;
+    position: relative;
+  }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ========= HOME SCREEN ========= */
+  #home {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: radial-gradient(ellipse at 50% 60%, #2a1f0a 0%, #0e0c08 70%);
+    padding: 2rem;
+  }
+
+  .corridor {
+    position: fixed; inset: 0;
+    background:
+      linear-gradient(to bottom, transparent 0%, rgba(14,12,8,0.7) 100%),
+      repeating-linear-gradient(
+        90deg,
+        transparent 0%,
+        transparent 8%,
+        rgba(201,168,76,0.03) 8%,
+        rgba(201,168,76,0.03) 9%
+      );
+    pointer-events: none;
+  }
+
+  .lantern-left, .lantern-right {
+    position: fixed;
+    top: 15%;
+    width: 3px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--gold-dim), transparent);
+  }
+  .lantern-left { left: 15%; }
+  .lantern-right { right: 15%; }
+  .lantern-left::after, .lantern-right::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 40px; height: 55px;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.25) 0%, transparent 70%);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 4px 4px 8px 8px;
+    animation: flicker 3s ease-in-out infinite alternate;
+  }
+  .lantern-right::after { animation-delay: 1.5s; }
+
+  @keyframes flicker {
+    0% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+  }
+
+  .home-content {
+    position: relative; z-index: 2;
+    animation: fadeUp 1.2s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .home-badge {
+    display: inline-block;
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.35rem 1rem;
+    margin-bottom: 2rem;
+    animation: fadeUp 1.2s 0.2s ease both;
+  }
+
+  .home-title {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(3rem, 10vw, 6rem);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    color: var(--parchment);
+    text-shadow: 0 0 60px rgba(201,168,76,0.3);
+    animation: fadeUp 1.2s 0.3s ease both;
+  }
+
+  .home-title span { color: var(--gold); }
+
+  .home-sub {
+    font-size: 0.95rem;
+    color: rgba(245,240,232,0.5);
+    margin: 1.5rem 0 3rem;
+    line-height: 1.8;
+    animation: fadeUp 1.2s 0.5s ease both;
+  }
+
+  .home-sub strong {
+    color: rgba(245,240,232,0.85);
+    font-weight: 500;
+  }
+
+  .silhouette {
+    position: fixed;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    opacity: 0.15;
+    pointer-events: none;
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 0.12; transform: translateX(-50%) translateY(0); }
+    50% { opacity: 0.2; transform: translateX(-50%) translateY(-8px); }
+  }
+
+  /* ========= BUTTON STYLES ========= */
+  .btn-primary {
+    display: inline-block;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 1rem 3rem;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.3s;
+    animation: fadeUp 1.2s 0.7s ease both;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: var(--gold);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: -1;
+  }
+
+  .btn-primary:hover { color: var(--ink); }
+  .btn-primary:hover::before { transform: translateX(0); }
+
+  /* ========= INTRO SCREEN ========= */
+  #intro {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: var(--ink);
+    padding: 2rem;
+  }
+
+  .giac-at-quote {
+    position: relative;
+    max-width: 480px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .giac-at-name {
+    font-size: 0.7rem;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+  }
+
+  .quote-line {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(1.4rem, 4vw, 2rem);
+    line-height: 1.6;
+    color: var(--parchment);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  .quote-line.visible { opacity: 1; }
+
+  .quote-pause {
+    display: block;
+    height: 1.5rem;
+  }
+
+  /* ========= GAME SCREEN ========= */
+  #game {
+    background: radial-gradient(ellipse at 50% 30%, #1a1408 0%, #0a0905 100%);
+    padding: 0;
+  }
+
+  .game-header {
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+
+  .room-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+  }
+
+  .stats-bar {
+    display: flex;
+    gap: 1.2rem;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    color: rgba(245,240,232,0.35);
+    text-transform: uppercase;
+  }
+
+  .stat-bar-wrap {
+    width: 50px;
+    height: 3px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .stat-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+
+  .stat-s .stat-bar-fill { background: #27ae60; }
+  .stat-e .stat-bar-fill { background: #f1c40f; }
+  .stat-c .stat-bar-fill { background: #ecf0f1; }
+
+  .stat-val {
+    font-size: 0.6rem;
+    color: rgba(245,240,232,0.5);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* SITUATION */
+  .game-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .situation-num {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+
+  .situation-text {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    line-height: 1.75;
+    color: var(--parchment);
+    margin-bottom: 0.75rem;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .situation-q {
+    font-size: 0.85rem;
+    color: rgba(245,240,232,0.45);
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+
+  /* TIMER */
+  .timer-wrap {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .timer-track {
+    width: 100%;
+    height: 2px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .timer-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    width: 100%;
+    transition: width linear;
+  }
+
+  .timer-fill.warning { background: var(--danger); }
+
+  .timer-num {
+    position: absolute;
+    right: 0; top: 6px;
+    font-size: 0.6rem;
+    color: var(--gold-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* OPTIONS */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .option-btn {
+    background: rgba(201,168,76,0.04);
+    border: 1px solid rgba(201,168,76,0.15);
+    color: var(--parchment);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    padding: 1rem 1.25rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .option-btn:hover {
+    background: rgba(201,168,76,0.1);
+    border-color: rgba(201,168,76,0.4);
+    transform: translateX(4px);
+  }
+
+  .option-key {
+    font-size: 0.7rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+  }
+
+  .option-btn.chosen-good {
+    background: rgba(39,174,96,0.15);
+    border-color: rgba(39,174,96,0.4);
+  }
+
+  .option-btn.chosen-bad {
+    background: rgba(192,57,43,0.15);
+    border-color: rgba(192,57,43,0.4);
+  }
+
+  .option-btn.dimmed {
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  /* GIA CAT FEEDBACK */
+  .feedback-wrap {
+    margin-top: 1.5rem;
+    border-left: 2px solid var(--gold);
+    padding: 1rem 1.25rem;
+    background: rgba(201,168,76,0.05);
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .feedback-name {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.6rem;
+  }
+
+  .feedback-text {
+    font-family: 'Noto Serif', serif;
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: rgba(245,240,232,0.85);
+    font-style: italic;
+  }
+
+  .stat-delta {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .delta-chip {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+
+  .delta-pos { background: rgba(39,174,96,0.2); color: #2ecc71; }
+  .delta-neg { background: rgba(192,57,43,0.2); color: #e74c3c; }
+
+  .next-btn {
+    margin-top: 1.5rem;
+    width: 100%;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: rgba(201,168,76,0.7);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+
+  .next-btn:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* ========= MIRROR LETTER (RESULT) ========= */
+  #result {
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: radial-gradient(ellipse at 50% 20%, #1a1408 0%, #070604 100%);
+  }
+
+  .mirror-wrap {
+    max-width: 520px;
+    width: 100%;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .mirror-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .mirror-eyebrow {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .mirror-title {
+    font-family: 'Noto Serif', serif;
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+    color: var(--parchment);
+  }
+
+  .mirror-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    margin: 1rem auto;
+    opacity: 0.5;
+  }
+
+  .mirror-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .mirror-stat {
+    text-align: center;
+    padding: 1rem;
+    border: 1px solid rgba(201,168,76,0.15);
+    background: rgba(201,168,76,0.04);
+  }
+
+  .mirror-stat-val {
+    font-family: 'Noto Serif', serif;
+    font-size: 1.8rem;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  .mirror-stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: rgba(245,240,232,0.4);
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+  }
+
+  .mirror-pattern {
+    padding: 1.25rem 1.5rem;
+    border-left: 2px solid var(--gold);
+    background: rgba(201,168,76,0.05);
+    margin-bottom: 1.5rem;
+  }
+
+  .mirror-pattern-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .mirror-pattern-text {
+    font-family: 'Noto Serif', serif;
+    font-size: 1rem;
+    line-height: 1.75;
+    color: rgba(245,240,232,0.85);
+    font-style: italic;
+  }
+
+  .mirror-letter-body {
+    font-size: 0.9rem;
+    line-height: 1.9;
+    color: rgba(245,240,232,0.65);
+    margin-bottom: 2rem;
+  }
+
+  .mirror-letter-body strong {
+    color: rgba(245,240,232,0.9);
+    font-weight: 500;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-retry {
+    flex: 1;
+    background: var(--gold);
+    border: none;
+    color: var(--ink);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    min-width: 140px;
+  }
+
+  .btn-retry:hover { opacity: 0.85; }
+
+  .btn-share {
+    flex: 1;
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: rgba(201,168,76,0.7);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 140px;
+  }
+
+  .btn-share:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* IP badge top right */
+  .ip-badge {
+    font-size: 0.65rem;
+    color: var(--gold-dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* GAMEOVER */
+  #gameover {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    background: radial-gradient(ellipse at 50% 50%, #1a0505 0%, #050302 100%);
+  }
+
+  .gameover-content { max-width: 400px; animation: fadeUp 0.8s ease both; }
+
+  .gameover-title {
+    font-family: 'Noto Serif', serif;
+    font-size: 3rem;
+    color: var(--danger);
+    margin-bottom: 0.5rem;
+    opacity: 0.8;
+  }
+
+  .gameover-quote {
+    font-family: 'Noto Serif', serif;
+    font-size: 1rem;
+    color: rgba(245,240,232,0.5);
+    font-style: italic;
+    line-height: 1.8;
+    margin: 1.5rem 0 2.5rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .stats-bar { gap: 0.8rem; }
+    .stat-bar-wrap { width: 36px; }
+    .game-body { padding: 1.5rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HOME ===== -->
+<div id="home" class="screen active">
+  <div class="corridor"></div>
+  <div class="lantern-left"></div>
+  <div class="lantern-right"></div>
+  <div class="home-content">
+    <div class="home-badge">Trắc nghiệm mức độ vô tri</div>
+    <h1 class="home-title">Check-in xem<br>mức độ <span>"Vô Tri"</span><br>của bạn tới đâu.</h1>
+    <p class="home-sub">
+      Mỗi câu chỉ <strong>5 giây.</strong><br>
+      Gia Cát Khổng Minh sẽ soi giúp bạn.
+    </p>
+    <button class="btn-primary" onclick="startIntro()">Bắt Đầu Ngay</button>
+  </div>
+  <!-- Silhouette SVG -->
+  <svg class="silhouette" viewBox="0 0 100 200" fill="currentColor">
+    <ellipse cx="50" cy="18" rx="12" ry="14" fill="currentColor"/>
+    <path d="M20 80 Q30 40 50 35 Q70 40 80 80 L85 160 Q70 170 50 172 Q30 170 15 160 Z" fill="currentColor"/>
+    <path d="M20 80 Q5 90 8 120 Q12 140 25 135 Q28 100 30 90" fill="currentColor"/>
+    <path d="M80 80 Q95 90 92 120 Q88 140 75 135 Q72 100 70 90" fill="currentColor"/>
+    <rect x="30" y="170" width="8" height="30" rx="4" fill="currentColor"/>
+    <rect x="62" y="170" width="8" height="30" rx="4" fill="currentColor"/>
+    <!-- Fan -->
+    <path d="M75 95 Q90 75 85 60 Q80 75 75 95Z" fill="currentColor" opacity="0.7"/>
+  </svg>
+</div>
+
+<!-- ===== INTRO ===== -->
+<div id="intro" class="screen">
+  <div class="giac-at-quote">
+    <div class="giac-at-name">Gia Cát Khổng Minh</div>
+    <p class="quote-line" id="q1">Ta không nghe lời nói.</p>
+    <span class="quote-pause"></span>
+    <p class="quote-line" id="q2">Ta chỉ nhìn lựa chọn.</p>
+    <br><br>
+    <button class="btn-primary" id="intro-cta" style="opacity:0;pointer-events:none" onclick="startGame()">Tiếp Tục</button>
+  </div>
+</div>
+
+<!-- ===== GAME ===== -->
+<div id="game" class="screen">
+  <div class="game-header">
+    <span class="room-label" id="room-label">Phòng 1</span>
+    <div class="stats-bar">
+      <div class="stat stat-s">
+        <span class="stat-label">S</span>
+        <div class="stat-bar-wrap"><div class="stat-bar-fill" id="bar-s" style="width:70%"></div></div>
+        <span class="stat-val" id="val-s">70</span>
+      </div>
+      <div class="stat stat-e">
+        <span class="stat-label">E</span>
+        <div class="stat-bar-wrap"><div class="stat-bar-fill" id="bar-e" style="width:70%"></div></div>
+        <span class="stat-val" id="val-e">70</span>
+      </div>
+      <div class="stat stat-c">
+        <span class="stat-label">C</span>
+        <div class="stat-bar-wrap"><div class="stat-bar-fill" id="bar-c" style="width:70%"></div></div>
+        <span class="stat-val" id="val-c">70</span>
+      </div>
+      <span class="ip-badge" id="ip-label">0 IP</span>
+    </div>
+  </div>
+
+  <div class="game-body">
+    <div class="situation-num" id="sit-num">Tình huống 1 / 5</div>
+    <p class="situation-text" id="sit-text"></p>
+    <p class="situation-q">Bạn làm gì?</p>
+
+    <div class="timer-wrap">
+      <div class="timer-track"><div class="timer-fill" id="timer-fill"></div></div>
+      <span class="timer-num" id="timer-num">4</span>
+    </div>
+
+    <div class="options" id="options"></div>
+    <div id="feedback-area"></div>
+  </div>
+</div>
+
+<!-- ===== GAME OVER ===== -->
+<div id="gameover" class="screen">
+  <div class="gameover-content">
+    <div class="gameover-title">Tâm Sụp</div>
+    <p class="gameover-quote" id="gameover-quote"></p>
+    <button class="btn-primary" onclick="resetGame()">Thử Lại</button>
+  </div>
+</div>
+
+<!-- ===== RESULT ===== -->
+<div id="result" class="screen">
+  <div class="mirror-wrap">
+    <div class="mirror-header">
+      <div class="mirror-eyebrow">Phòng Gương</div>
+      <h2 class="mirror-title">Ta đã quan sát<br>ngươi đủ rồi.</h2>
+      <div class="mirror-divider"></div>
+    </div>
+
+    <div class="mirror-stats">
+      <div class="mirror-stat">
+        <div class="mirror-stat-val" id="res-ip">0</div>
+        <div class="mirror-stat-label">IP Tích lũy</div>
+      </div>
+      <div class="mirror-stat">
+        <div class="mirror-stat-val" id="res-good">0</div>
+        <div class="mirror-stat-label">Đối diện sự thật</div>
+      </div>
+      <div class="mirror-stat">
+        <div class="mirror-stat-val" id="res-avoid">0</div>
+        <div class="mirror-stat-label">Né tránh / Bao biện</div>
+      </div>
+    </div>
+
+    <div class="mirror-pattern">
+      <div class="mirror-pattern-label">Gia Cát nhận xét</div>
+      <p class="mirror-pattern-text" id="mirror-pattern-text"></p>
+    </div>
+
+    <p class="mirror-letter-body" id="mirror-letter-body"></p>
+
+    <div class="result-actions">
+      <button class="btn-retry" onclick="resetGame()">Chơi Lại</button>
+      <button class="btn-share" onclick="shareResult()">Chia Sẻ Kết Quả</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA — 8 tình huống gia đình & bạn bè
+// ============================================================
+const situations = [
+  {
+    id: "T2_GD_01",
+    room: 1, sit_in_room: 1,
+    text: "Ba/mẹ hỏi lương tháng này của bạn. Bạn đang kiếm ít hơn kỳ vọng của họ.",
+    options: [
+      {
+        id:"A", txt:"Nói thật con số, giải thích bối cảnh.",
+        type:"su_that_tu_te", pattern:"growth_oriented",
+        s:15, e:-5, c:15, ip:20,
+        g:"Nói thật với ba/mẹ về tiền không dễ — nhất là khi ngươi biết họ kỳ vọng nhiều hơn. Đó là can đảm, không phải yếu đuối.",
+      },
+      {
+        id:"B", txt:"Nói con số cao hơn thực tế một chút cho ba/mẹ yên tâm.",
+        type:"sid_dien_bao_bien", pattern:"people_pleaser",
+        s:-5, e:-20, c:-25, ip:3,
+        g:"Ngươi vừa mua sự yên tâm của ba/mẹ bằng một cái giá — sự thật của chính ngươi. Và khoản nợ đó sẽ đến hạn.",
+      },
+      {
+        id:"C", txt:"Lảng sang chuyện khác, hỏi ngược ba/mẹ chuyện nhà.",
+        type:"ne_tranh_hen_nhat", pattern:"avoidant",
+        s:-5, e:-10, c:-20, ip:0,
+        g:"Thoát được câu hỏi. Nhưng lần tới họ hỏi — ngươi sẽ né bằng gì nữa?",
+      }
+    ]
+  },
+  {
+    id: "T2_GD_02",
+    room: 1, sit_in_room: 2,
+    text: "Em/anh trong nhà vay tiền lần thứ ba. Lần trước chưa trả. Lần này lại cần gấp.",
+    options: [
+      {
+        id:"A", txt:"Hỏi thẳng về khoản nợ cũ trước khi quyết định.",
+        type:"su_that_tu_te", pattern:"assertive",
+        s:10, e:5, c:15, ip:20,
+        g:"Nhắc đến nợ cũ với người thân không ai muốn làm — vì sợ mất lòng. Nhưng ngươi vừa chọn sự thật thay vì sự dễ chịu.",
+      },
+      {
+        id:"B", txt:"Cho mượn vì ngại từ chối người thân.",
+        type:"sid_dien_bao_bien", pattern:"people_pleaser",
+        s:-10, e:-15, c:-20, ip:3,
+        g:"Ngươi không cho vì thương — ngươi cho vì ngại. Hai thứ đó trông giống nhau nhưng khác nhau hoàn toàn.",
+      },
+      {
+        id:"C", txt:"Nói đang kẹt tiền, dù thật ra vẫn có.",
+        type:"ne_tranh_hen_nhat", pattern:"avoidant",
+        s:-5, e:-20, c:-25, ip:0,
+        g:"Nói dối để thoát — lần này xong. Nhưng ngươi vừa đặt một viên gạch lên bức tường giữa ngươi và họ.",
+      }
+    ]
+  },
+  {
+    id: "T2_BB_01",
+    room: 2, sit_in_room: 1,
+    text: "Bạn thân tâm sự chuyện buồn. Bạn đang bận và thật ra không có tâm trạng nghe.",
+    options: [
+      {
+        id:"A", txt:"Nói thật mình đang không ổn, hẹn nói chuyện sau.",
+        type:"su_that_tu_te", pattern:"assertive",
+        s:10, e:5, c:15, ip:18,
+        g:"Nói 'tao đang không có tâm trạng' với bạn thân khó hơn ngươi tưởng. Nhưng đó là tôn trọng cả hai — thay vì giả vờ lắng nghe.",
+      },
+      {
+        id:"B", txt:"Gật đầu và ừ hử cho qua, dù không thực sự nghe.",
+        type:"sid_dien_bao_bien", pattern:"people_pleaser",
+        s:-5, e:-10, c:-20, ip:3,
+        g:"Ngươi có mặt nhưng không thật sự ở đó. Bạn ngươi đang nói chuyện với cái bóng của ngươi.",
+      },
+      {
+        id:"C", txt:"Trả lời qua loa, hy vọng họ tự hiểu.",
+        type:"ne_tranh_hen_nhat", pattern:"passive_aggressive",
+        s:-10, e:-15, c:-20, ip:2,
+        g:"Gửi tín hiệu mà không nói thẳng — đó là cách dễ nhất để tạo ra hiểu lầm và ngươi vẫn cảm thấy mình không có lỗi.",
+      }
+    ]
+  },
+  {
+    id: "T2_BB_02",
+    room: 2, sit_in_room: 2,
+    text: "Bạn phát hiện bạn thân nói xấu mình với nhóm bạn chung. Hôm nay gặp mặt.",
+    options: [
+      {
+        id:"A", txt:"Hỏi thẳng một mình họ, trước khi gặp cả nhóm.",
+        type:"su_that_tu_te", pattern:"assertive",
+        s:15, e:5, c:15, ip:20,
+        g:"Đối diện trực tiếp thay vì để nó âm ỉ — đó là cách duy nhất có thể thật sự giải quyết được. Hiếm người làm được vậy.",
+      },
+      {
+        id:"B", txt:"Cư xử bình thường, nhưng trong lòng đã ghi sổ.",
+        type:"ne_tranh_hen_nhat", pattern:"passive_aggressive",
+        s:-15, e:-10, c:-25, ip:2,
+        g:"Ngươi đang xây một cái két sắt bên trong và nhét tất cả vào đó. Két sắt đó sẽ nổ — chỉ là ngươi chưa biết lúc nào.",
+      },
+      {
+        id:"C", txt:"Tránh gặp mặt hôm nay với lý do bận.",
+        type:"ne_tranh_chien_thuat", pattern:"avoidant",
+        s:0, e:-5, c:-10, ip:5,
+        g:"Lùi lại để suy nghĩ — có thể khôn. Nhưng nếu đây là lần thứ ba ngươi 'lùi lại' vấn đề này — thì đó không phải suy nghĩ, đó là trốn.",
+      }
+    ]
+  },
+  {
+    id: "T2_GD_03",
+    room: 2, sit_in_room: 3,
+    text: "Ba/mẹ so sánh bạn với anh/chị/em họ trước mặt cả nhà: 'Nhìn thằng A/con B mà học'.",
+    options: [
+      {
+        id:"A", txt:"Bình tĩnh nói rằng cách so sánh đó khiến bạn không thoải mái.",
+        type:"su_that_tu_te", pattern:"assertive",
+        s:15, e:10, c:15, ip:20,
+        g:"Nói với ba/mẹ rằng họ đang làm mình đau — không phải hỗn, đó là trưởng thành. Không phải ai cũng dám làm vậy.",
+      },
+      {
+        id:"B", txt:"Im lặng, nuốt vào, về phòng.",
+        type:"ne_tranh_hen_nhat", pattern:"avoidant",
+        s:-15, e:-10, c:-20, ip:0,
+        g:"Nuốt lần này. Rồi lần sau. Rồi lần sau nữa. Tới lúc ngươi không còn muốn về nhà nữa — ngươi có biết tại sao không?",
+      },
+      {
+        id:"C", txt:"Nói 'con hiểu rồi' cho xong chuyện.",
+        type:"sid_dien_bao_bien", pattern:"people_pleaser",
+        s:-5, e:-15, c:-20, ip:3,
+        g:"Ngươi không hiểu — ngươi chỉ đang đóng cửa. Mỗi lần nói 'con hiểu' mà không thật, khoảng cách giữa ngươi và ba/mẹ lại rộng thêm một chút.",
+      }
+    ]
+  },
+  {
+    id: "T2_BB_03",
+    room: 3, sit_in_room: 1,
+    text: "Bạn thân nhờ bạn giữ bí mật. Sau đó bạn biết bí mật đó đang gây hại cho người khác.",
+    options: [
+      {
+        id:"A", txt:"Nói thẳng với bạn rằng bạn không thể im lặng mãi về chuyện này.",
+        type:"su_that_tu_te", pattern:"growth_oriented",
+        s:15, e:0, c:15, ip:20,
+        g:"Trung thành với bạn bè là tốt. Nhưng trung thành với điều đúng đắn mới là bạn thật. Ngươi đang chọn cái khó hơn.",
+      },
+      {
+        id:"B", txt:"Im lặng vì đã hứa giữ bí mật.",
+        type:"ne_tranh_hen_nhat", pattern:"avoidant",
+        s:-10, e:-5, c:-20, ip:3,
+        g:"Ngươi giữ lời hứa — nhưng cái giá là người khác đang chịu thiệt. Lương tâm ngươi có thật sự yên không?",
+      },
+      {
+        id:"C", txt:"Để lộ thông tin ẩn danh để người liên quan tự biết.",
+        type:"sid_dien_bao_bien", pattern:"defensive",
+        s:0, e:-15, c:-10, ip:5,
+        g:"Làm mà không nhận — ngươi muốn giải quyết vấn đề nhưng không muốn chịu trách nhiệm. Đó là can đảm nửa vời.",
+      }
+    ]
+  },
+  {
+    id: "T2_GD_04",
+    room: 3, sit_in_room: 2,
+    text: "Ba/mẹ muốn bạn về quê dịp lễ. Bạn đã có kế hoạch đi chơi với bạn bè từ trước.",
+    options: [
+      {
+        id:"A", txt:"Nói thật về kế hoạch, cùng tìm thời điểm khác về thăm.",
+        type:"su_that_tu_te", pattern:"assertive",
+        s:10, e:5, c:15, ip:18,
+        g:"Nói thật với ba/mẹ và vẫn giữ kế hoạch — đó không phải bất hiếu. Đó là người biết mình muốn gì và dám nói ra.",
+      },
+      {
+        id:"B", txt:"Hủy kế hoạch bạn bè, không nói lý do thật.",
+        type:"sid_dien_bao_bien", pattern:"people_pleaser",
+        s:-10, e:-10, c:-20, ip:3,
+        g:"Ngươi làm hài lòng ba/mẹ — nhưng mang theo sự tiếc nuối. Và lần sau ngươi lại làm vậy. Vì ngươi chưa bao giờ thật sự chọn — ngươi chỉ né.",
+      },
+      {
+        id:"C", txt:"Hứa về nhưng tìm cách trì hoãn đến phút chót.",
+        type:"ne_tranh_hen_nhat", pattern:"avoidant",
+        s:-10, e:-20, c:-25, ip:0,
+        g:"Hứa mà không định giữ — đó không phải linh hoạt, đó là nói dối được lên lịch sẵn.",
+      }
+    ]
+  },
+  {
+    id: "T2_BB_04",
+    room: 3, sit_in_room: 3,
+    text: "Nhóm bạn rủ đi chơi nhưng bạn không muốn. Bạn chỉ muốn ở nhà nghỉ ngơi.",
+    options: [
+      {
+        id:"A", txt:"Nói thật 'tao cần nghỉ, lần này không đi được'.",
+        type:"su_that_tu_te", pattern:"assertive",
+        s:15, e:5, c:15, ip:18,
+        g:"Nói không vì ngươi cần nghỉ — không phải lý do giả tạo. Đó là tôn trọng bản thân và tôn trọng bạn bè.",
+      },
+      {
+        id:"B", txt:"Bịa lý do: bận việc, không khỏe, có hẹn khác.",
+        type:"sid_dien_bao_bien", pattern:"people_pleaser",
+        s:-5, e:-15, c:-20, ip:2,
+        g:"Ngươi không dám nói 'tao chỉ muốn ở nhà' — vì sợ bị phán xét. Nhưng cái lý do giả đó mới là thứ đáng xấu hổ hơn.",
+      },
+      {
+        id:"C", txt:"Đi cho xong dù không muốn.",
+        type:"ne_tranh_chien_thuat", pattern:"people_pleaser",
+        s:-10, e:-5, c:-15, ip:3,
+        g:"Đi mà không muốn — ngươi ở đó nhưng không thật sự có mặt. Bạn bè nhận được cái xác của ngươi, không phải ngươi.",
+      }
+    ]
+  }
+];
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let state = {
+  screen: 'home',
+  S: 70, E: 70, C: 70, IP: 0,
+  sitIndex: 0,
+  timer: null,
+  timeLeft: 4,
+  answered: false,
+  goodCount: 0,
+  badCount: 0,
+  patterns: []
+};
+
+// ============================================================
+// SCREEN MANAGEMENT
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ============================================================
+// HOME → INTRO
+// ============================================================
+function startIntro() {
+  showScreen('intro');
+  setTimeout(() => {
+    document.getElementById('q1').classList.add('visible');
+  }, 400);
+  setTimeout(() => {
+    document.getElementById('q2').classList.add('visible');
+  }, 1600);
+  setTimeout(() => {
+    const cta = document.getElementById('intro-cta');
+    cta.style.opacity = '1';
+    cta.style.pointerEvents = 'auto';
+  }, 2800);
+}
+
+// ============================================================
+// INTRO → GAME
+// ============================================================
+function startGame() {
+  showScreen('game');
+  renderSituation();
+}
+
+// ============================================================
+// RENDER SITUATION
+// ============================================================
+function renderSituation() {
+  const sit = situations[state.sitIndex];
+  if (!sit) { showResult(); return; }
+
+  state.answered = false;
+
+  // Header
+  const room = sit.room;
+  document.getElementById('room-label').textContent = `Phòng ${room}`;
+  document.getElementById('sit-num').textContent = `Tình huống ${state.sitIndex + 1} / ${situations.length}`;
+
+  // Text
+  const textEl = document.getElementById('sit-text');
+  textEl.style.animation = 'none';
+  textEl.offsetHeight;
+  textEl.style.animation = '';
+  textEl.textContent = sit.text;
+
+  // Clear feedback
+  document.getElementById('feedback-area').innerHTML = '';
+
+  // Hide options and timer during reading phase
+  const optWrap = document.getElementById('options');
+  optWrap.innerHTML = '';
+  optWrap.style.opacity = '0';
+  optWrap.style.pointerEvents = 'none';
+
+  const timerWrap = document.querySelector('.timer-wrap');
+  timerWrap.style.opacity = '0';
+
+  // Reading countdown indicator
+  const sitNum = document.getElementById('sit-num');
+  let readLeft = 5;
+  sitNum.textContent = `Tình huống ${state.sitIndex + 1} / ${situations.length}  —  đọc kỹ... ${readLeft}s`;
+
+  const readInterval = setInterval(() => {
+    readLeft--;
+    if (readLeft > 0) {
+      sitNum.textContent = `Tình huống ${state.sitIndex + 1} / ${situations.length}  —  đọc kỹ... ${readLeft}s`;
+    } else {
+      clearInterval(readInterval);
+      sitNum.textContent = `Tình huống ${state.sitIndex + 1} / ${situations.length}`;
+
+      // Build options
+      sit.options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.innerHTML = `<span class="option-key">${opt.id}</span><span>${opt.txt}</span>`;
+        btn.onclick = () => choose(opt);
+        optWrap.appendChild(btn);
+      });
+
+      // Fade in options + timer
+      timerWrap.style.transition = 'opacity 0.4s ease';
+      timerWrap.style.opacity = '1';
+      optWrap.style.transition = 'opacity 0.4s ease';
+      optWrap.style.opacity = '1';
+      optWrap.style.pointerEvents = 'auto';
+
+      // Start the 4-second decision timer
+      startTimer();
+    }
+  }, 1000);
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+function startTimer() {
+  clearInterval(state.timer);
+  state.timeLeft = 5;
+  const fill = document.getElementById('timer-fill');
+  const num = document.getElementById('timer-num');
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  fill.classList.remove('warning');
+  num.textContent = '5';
+
+  setTimeout(() => {
+    fill.style.transition = `width ${5000}ms linear`;
+    fill.style.width = '0%';
+  }, 50);
+
+  state.timer = setInterval(() => {
+    state.timeLeft -= 1;
+    num.textContent = Math.max(0, state.timeLeft);
+    if (state.timeLeft <= 2) fill.classList.add('warning');
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timer);
+      if (!state.answered) timeOut();
+    }
+  }, 1000);
+}
+
+function timeOut() {
+  // Auto pick worst — passive avoidance
+  const sit = situations[state.sitIndex];
+  const worst = sit.options[sit.options.length - 1];
+  choose(worst, true);
+}
+
+// ============================================================
+// CHOOSE
+// ============================================================
+function choose(opt, timedOut = false) {
+  if (state.answered) return;
+  state.answered = true;
+  clearInterval(state.timer);
+
+  // Apply stats
+  state.S = Math.min(100, Math.max(0, state.S + opt.s));
+  state.E = Math.min(100, Math.max(0, state.E + opt.e));
+  state.C = Math.min(100, Math.max(0, state.C + opt.c));
+  state.IP += opt.ip;
+  if (state.IP < 0) state.IP = 0;
+
+  // Count patterns
+  state.patterns.push(opt.pattern);
+  if (opt.type === 'su_that_tu_te') state.goodCount++;
+  else state.badCount++;
+
+  // Highlight chosen
+  const btns = document.querySelectorAll('.option-btn');
+  btns.forEach(btn => {
+    const key = btn.querySelector('.option-key').textContent;
+    if (key === opt.id) {
+      btn.classList.add(opt.type === 'su_that_tu_te' ? 'chosen-good' : 'chosen-bad');
+    } else {
+      btn.classList.add('dimmed');
+    }
+  });
+
+  // Update stats UI
+  updateStatsUI();
+
+  // Show feedback
+  showFeedback(opt, timedOut);
+
+  // Check death
+  if (state.S <= 20 || state.E <= 15 || state.C <= 0) {
+    setTimeout(() => showGameOver(), 2500);
+    return;
+  }
+}
+
+// ============================================================
+// FEEDBACK
+// ============================================================
+function showFeedback(opt, timedOut) {
+  const area = document.getElementById('feedback-area');
+
+  const deltas = [
+    { label: 'S', val: opt.s },
+    { label: 'E', val: opt.e },
+    { label: 'C', val: opt.c },
+    { label: 'IP', val: opt.ip },
+  ].filter(d => d.val !== 0);
+
+  const deltaHtml = deltas.map(d =>
+    `<span class="delta-chip ${d.val > 0 ? 'delta-pos' : 'delta-neg'}">${d.label} ${d.val > 0 ? '+' : ''}${d.val}</span>`
+  ).join('');
+
+  area.innerHTML = `
+    <div class="feedback-wrap">
+      <div class="feedback-name">Gia Cát</div>
+      <p class="feedback-text">${timedOut ? 'Ngươi để thời gian trôi qua mà không chọn gì. Đôi khi sự im lặng cũng là một lựa chọn — chỉ là không phải lựa chọn ngươi muốn.' : opt.g}</p>
+      <div class="stat-delta">${deltaHtml}</div>
+    </div>
+    <button class="next-btn" onclick="nextSituation()">
+      ${state.sitIndex + 1 >= situations.length ? 'Xem Phòng Gương →' : 'Tiếp Theo →'}
+    </button>
+  `;
+}
+
+// ============================================================
+// NEXT
+// ============================================================
+function nextSituation() {
+  state.sitIndex++;
+  if (state.sitIndex >= situations.length) {
+    showResult();
+  } else {
+    renderSituation();
+  }
+}
+
+// ============================================================
+// STATS UI
+// ============================================================
+function updateStatsUI() {
+  document.getElementById('bar-s').style.width = state.S + '%';
+  document.getElementById('bar-e').style.width = state.E + '%';
+  document.getElementById('bar-c').style.width = state.C + '%';
+  document.getElementById('val-s').textContent = state.S;
+  document.getElementById('val-e').textContent = state.E;
+  document.getElementById('val-c').textContent = state.C;
+  document.getElementById('ip-label').textContent = state.IP + ' IP';
+}
+
+// ============================================================
+// GAME OVER
+// ============================================================
+function showGameOver() {
+  const quotes = {
+    S: "Stability sụp đổ. Tâm không trụ được — không phải vì thế giới quá nặng, mà vì ngươi chưa thật với chính mình.",
+    E: "Edge về không. Cái tôi không còn chỗ đứng — khi ngươi liên tục che đậy, đến một lúc không còn gì để che nữa.",
+    C: "Clarity tắt. Ngươi đã đứng hình quá lâu — đến mức không còn nhìn thấy gì nữa."
+  };
+
+  let cause = 'S';
+  if (state.E <= 15) cause = 'E';
+  if (state.C <= 0) cause = 'C';
+
+  document.getElementById('gameover-quote').textContent = quotes[cause];
+  showScreen('gameover');
+}
+
+// ============================================================
+// RESULT / MIRROR LETTER
+// ============================================================
+function showResult() {
+  // Pattern analysis
+  const patternCounts = {};
+  state.patterns.forEach(p => { patternCounts[p] = (patternCounts[p] || 0) + 1; });
+  const topPattern = Object.entries(patternCounts).sort((a,b) => b[1]-a[1])[0]?.[0] || 'avoidant';
+
+  const patternData = {
+    growth_oriented: {
+      label: "Người Đối Diện",
+      giac: "Ngươi chọn nhìn thẳng vào sự thật nhiều hơn phần lớn người ta dám làm. Đây không phải điểm số — đây là dấu hiệu của người đang thật sự lớn.",
+      letter: "Trong suốt 5 tình huống vừa rồi, <strong>ngươi chọn sự thật nhiều hơn sự an toàn</strong>. Điều đó không dễ — và không phải ai cũng nhận ra mình đang làm vậy. Nhưng biết rằng: người đối diện được sự thật không phải là người không sợ. Họ là người sợ mà vẫn chọn nhìn vào."
+    },
+    avoidant: {
+      label: "Kẻ Né Tránh",
+      giac: "Ngươi hay chọn lùi. Đôi khi đó là khôn ngoan — nhưng phần lớn, đó là khoản nợ ngươi đang vay từ tương lai của chính mình.",
+      letter: "Nhìn vào các lựa chọn của ngươi, có một sợi chỉ xuyên suốt: <strong>ngươi thường chọn con đường ít đau nhất trong lúc này</strong>. Không phán xét — đó là phản xạ sinh tồn rất con người. Nhưng câu hỏi là: những gì ngươi né hôm nay sẽ gặp lại ngươi ở đâu?"
+    },
+    defensive: {
+      label: "Kẻ Phòng Thủ",
+      giac: "Ngươi hay giải thích trước khi thừa nhận. Không phải ngươi xấu — ngươi chỉ đang bảo vệ cái gì đó bên trong mà ngươi chưa dám nhìn thẳng vào.",
+      letter: "Trong nhiều tình huống, <strong>ngươi phản ứng bằng cách giải thích</strong> — tại sao mình không sai, tại sao hoàn cảnh khó khăn, tại sao người khác chưa hiểu đủ. Sự phòng thủ đó tốn năng lượng hơn ngươi nghĩ. Và nó giữ ngươi ở chỗ cũ."
+    },
+    people_pleaser: {
+      label: "Kẻ Làm Vừa Lòng",
+      giac: "Ngươi hay chọn thứ người khác muốn nghe hơn thứ ngươi thật sự nghĩ. Ngươi gọi đó là tử tế — nhưng đôi khi đó chỉ là sợ bị không thích.",
+      letter: "Ngươi có xu hướng <strong>ưu tiên cảm xúc của người khác hơn sự thật</strong>. Điều đó không ác — nhưng nó đang làm hao mòn chính ngươi. Người thật sự cần ngươi không cần ngươi đồng ý. Họ cần ngươi trung thực."
+    },
+    comparing: {
+      label: "Kẻ So Sánh",
+      giac: "Ngươi hay nhìn sang người bên cạnh. Không phải để học — mà để đo. Cái thước đó không bao giờ cho ngươi thấy đủ.",
+      letter: "Một số lựa chọn của ngươi tiết lộ <strong>thói quen đo giá trị bản thân qua người khác</strong>. Khi ai đó có nhiều hơn, ngươi cảm thấy thiếu. Khi ai đó kém hơn, ngươi mới thấy ổn. Cái vòng đó không có điểm kết thúc."
+    },
+    cautious: {
+      label: "Kẻ Thận Trọng",
+      giac: "Ngươi hay dừng lại và quan sát trước. Đó là sức mạnh — nhưng cũng có thể là cái bẫy nếu 'thận trọng' trở thành lý do để không bao giờ nói thật.",
+      letter: "Ngươi <strong>ít phản ứng vội vàng</strong> — đó là điểm mạnh hiếm có. Nhưng nhìn lại: bao nhiêu lần 'chờ thêm' của ngươi thật ra là 'tránh đụng chạm'? Ranh giới đó mỏng hơn ngươi nghĩ."
+    },
+    assertive: {
+      label: "Kẻ Lên Tiếng",
+      giac: "Ngươi biết lên tiếng khi cần. Đó không phải là ồn ào — đó là tự trọng. Hiếm lắm.",
+      letter: "Ngươi không ngại <strong>bày tỏ lập trường của mình</strong> — kể cả khi không thoải mái. Đó là thứ nhiều người mất hàng năm mới học được, hoặc không bao giờ học được. Giữ lấy nó."
+    },
+    passive_aggressive: {
+      label: "Kẻ Nuốt Vào Rồi Rải Ra",
+      giac: "Ngươi không nói thẳng — nhưng không im được. Cái năng lượng đó thoát ra theo kiểu khác, và ngươi trả giá cho nó bằng Stability của chính mình.",
+      letter: "Có một pattern rõ trong các lựa chọn của ngươi: <strong>nuốt vào trong thay vì xử lý trực tiếp</strong>. Cơn tức không mất — nó chỉ đổi hướng. Và hướng đó thường là vào chính ngươi, hoặc vào những người không liên quan."
+    }
+  };
+
+  const pd = patternData[topPattern] || patternData['avoidant'];
+
+  document.getElementById('res-ip').textContent = state.IP;
+  document.getElementById('res-good').textContent = state.goodCount;
+  document.getElementById('res-avoid').textContent = state.badCount;
+  document.getElementById('mirror-pattern-text').textContent = pd.giac;
+  document.getElementById('mirror-letter-body').innerHTML = pd.letter;
+
+  showScreen('result');
+}
+
+// ============================================================
+// SHARE
+// ============================================================
+function shareResult() {
+  const patterns = {
+    growth_oriented: "Người Đối Diện",
+    avoidant: "Kẻ Né Tránh",
+    defensive: "Kẻ Phòng Thủ",
+    people_pleaser: "Kẻ Làm Vừa Lòng",
+    comparing: "Kẻ So Sánh",
+    cautious: "Kẻ Thận Trọng",
+    assertive: "Kẻ Lên Tiếng",
+    passive_aggressive: "Kẻ Nuốt Vào Rồi Rải Ra"
+  };
+
+  const patternCounts = {};
+  state.patterns.forEach(p => { patternCounts[p] = (patternCounts[p] || 0) + 1; });
+  const top = Object.entries(patternCounts).sort((a,b) => b[1]-a[1])[0]?.[0] || 'avoidant';
+  const label = patterns[top] || top;
+
+  const text = `Tôi vừa chơi Hết Vô Tri và Gia Cát gọi tôi là "${label}" với ${state.IP} IP. Bạn dám thử không? 👁️`;
+
+  if (navigator.share) {
+    navigator.share({ title: 'Hết Vô Tri', text });
+  } else {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Đã copy! Dán vào TikTok / Story của bạn.');
+    });
+  }
+}
+
+// ============================================================
+// RESET
+// ============================================================
+function resetGame() {
+  state = { screen: 'home', S: 70, E: 70, C: 70, IP: 0, sitIndex: 0, timer: null, timeLeft: 4, answered: false, goodCount: 0, badCount: 0, patterns: [] };
+  clearInterval(state.timer);
+
+  // Reset intro quotes
+  document.getElementById('q1').classList.remove('visible');
+  document.getElementById('q2').classList.remove('visible');
+  const cta = document.getElementById('intro-cta');
+  cta.style.opacity = '0';
+  cta.style.pointerEvents = 'none';
+
+  updateStatsUI();
+  showScreen('home');
+}
+</script>
+</body>
+</html>
