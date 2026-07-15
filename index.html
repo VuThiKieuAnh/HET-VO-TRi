@@ -63,10 +63,13 @@
   /* ========= HOME SCREEN ========= */
   #home {
     align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: radial-gradient(ellipse at 50% 60%, #2a1f0a 0%, #0e0c08 70%);
-    padding: 2rem;
+    justify-content: flex-start;
+    text-align: left;
+    background-image: linear-gradient(to right, rgba(8,6,4,0.94) 30%, rgba(8,6,4,0.55) 62%, rgba(8,6,4,0.18) 100%), url('giac-full.jpg');
+    background-size: cover;
+    background-position: right center;
+    background-repeat: no-repeat;
+    padding: 2rem 2rem 2rem 2.5rem;
   }
 
   .corridor {
@@ -113,6 +116,7 @@
   .home-content {
     position: relative; z-index: 2;
     animation: fadeUp 1.2s ease both;
+    max-width: 560px;
   }
 
   @keyframes fadeUp {
@@ -134,10 +138,10 @@
 
   .home-title {
     font-family: 'Noto Serif', serif;
-    font-size: clamp(3rem, 10vw, 6rem);
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
     font-weight: 700;
-    letter-spacing: 0.05em;
-    line-height: 1;
+    letter-spacing: 0.03em;
+    line-height: 1.1;
     color: var(--parchment);
     text-shadow: 0 0 60px rgba(201,168,76,0.3);
     animation: fadeUp 1.2s 0.3s ease both;
@@ -1459,6 +1463,28 @@
     .game-body { padding: 1.5rem 1rem; }
   }
 
+  /* HOME SCREEN — MOBILE PORTRAIT
+     Ảnh nền gốc là banner ngang (tỉ lệ ~1.9:1). Trên màn hẹp/dọc,
+     background-size:cover sẽ crop rất mạnh theo chiều ngang và có thể
+     mất mặt nhân vật. Đổi hướng gradient thành dọc (rõ hơn ở dưới nơi
+     có chữ) và ghim vị trí crop vào đúng vùng mặt/mũ quan thay vì để
+     mặc định "right center".
+  */
+  @media (max-width: 700px) {
+    #home {
+      justify-content: center;
+      text-align: center;
+      background-image:
+        linear-gradient(to bottom, rgba(8,6,4,0.45) 0%, rgba(8,6,4,0.75) 55%, rgba(8,6,4,0.94) 100%),
+        url('giac-full.jpg');
+      background-position: 68% 22%;
+      background-size: cover;
+      padding: 2rem 1.5rem;
+    }
+    .home-content { max-width: 100%; }
+    .home-title { font-size: clamp(2.1rem, 9vw, 3rem); }
+  }
+
   /* SETTINGS BAR */
   .settings-bar {
     display: flex;
@@ -1707,7 +1733,7 @@
     <button class="btn-continue" id="btn-continue" onclick="loadAndContinue()" style="display:none">Chơi Tiếp →</button>
   </div>
   <!-- Gia Cát character art -->
-  <img class="silhouette" src="giac-bg.png" alt="Gia Cát Khổng Minh">
+
 </div>
 
 <!-- ===== ARC SELECT ===== -->
