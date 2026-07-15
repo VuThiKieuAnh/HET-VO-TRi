@@ -162,15 +162,17 @@
     position: fixed;
     bottom: 0; left: 50%;
     transform: translateX(-50%);
-    width: 120px;
-    opacity: 0.15;
+    width: 280px;
+    max-width: 70vw;
+    opacity: 0.9;
     pointer-events: none;
     animation: breathe 4s ease-in-out infinite;
+    z-index: 1;
   }
 
   @keyframes breathe {
-    0%, 100% { opacity: 0.12; transform: translateX(-50%) translateY(0); }
-    50% { opacity: 0.2; transform: translateX(-50%) translateY(-8px); }
+    0%, 100% { opacity: 0.8; transform: translateX(-50%) translateY(0); }
+    50% { opacity: 1; transform: translateX(-50%) translateY(-8px); }
   }
 
   /* ========= BUTTON STYLES ========= */
@@ -1649,6 +1651,43 @@
     font-size: 1.2rem;
     align-self: center;
   }
+
+  /* ========= PER-ARC THEMED BACKGROUND (in-game screens) ========= */
+  /* Applied via body[data-arc="N"] once an arc is selected, so it covers
+     the situation screen, room summary, room review, mirror room and
+     gate-fail screen — using the same artwork as the arc-select cards. */
+  body[data-arc="1"] #game, body[data-arc="1"] #room-summary, body[data-arc="1"] #room-review, body[data-arc="1"] #result, body[data-arc="1"] #gameover {
+    background-image: linear-gradient(rgba(8,6,4,0.87), rgba(8,6,4,0.87)), url('arc1.jpg');
+    background-size: cover; background-position: center;
+  }
+  body[data-arc="2"] #game, body[data-arc="2"] #room-summary, body[data-arc="2"] #room-review, body[data-arc="2"] #result, body[data-arc="2"] #gameover {
+    background-image: linear-gradient(rgba(6,8,10,0.87), rgba(6,8,10,0.87)), url('arc2.jpg');
+    background-size: cover; background-position: center;
+  }
+  body[data-arc="3"] #game, body[data-arc="3"] #room-summary, body[data-arc="3"] #room-review, body[data-arc="3"] #result, body[data-arc="3"] #gameover {
+    background-image: linear-gradient(rgba(6,7,12,0.87), rgba(6,7,12,0.87)), url('arc3.jpg');
+    background-size: cover; background-position: center;
+  }
+  body[data-arc="4"] #game, body[data-arc="4"] #room-summary, body[data-arc="4"] #room-review, body[data-arc="4"] #result, body[data-arc="4"] #gameover {
+    background-image: linear-gradient(rgba(8,8,14,0.87), rgba(8,8,14,0.87)), url('arc4.jpg');
+    background-size: cover; background-position: center;
+  }
+  body[data-arc="5"] #game, body[data-arc="5"] #room-summary, body[data-arc="5"] #room-review, body[data-arc="5"] #result, body[data-arc="5"] #gameover {
+    background-image: linear-gradient(rgba(6,8,6,0.87), rgba(6,8,6,0.87)), url('arc5.jpg');
+    background-size: cover; background-position: center;
+  }
+  body[data-arc="6"] #game, body[data-arc="6"] #room-summary, body[data-arc="6"] #room-review, body[data-arc="6"] #result, body[data-arc="6"] #gameover {
+    background-image: linear-gradient(rgba(8,8,10,0.87), rgba(8,8,10,0.87)), url('arc6.jpg');
+    background-size: cover; background-position: center;
+  }
+  body[data-arc="7"] #game, body[data-arc="7"] #room-summary, body[data-arc="7"] #room-review, body[data-arc="7"] #result, body[data-arc="7"] #gameover {
+    background-image: linear-gradient(rgba(6,8,12,0.87), rgba(6,8,12,0.87)), url('arc7.jpg');
+    background-size: cover; background-position: center;
+  }
+  body[data-arc="8"] #game, body[data-arc="8"] #room-summary, body[data-arc="8"] #room-review, body[data-arc="8"] #result, body[data-arc="8"] #gameover {
+    background-image: linear-gradient(rgba(10,6,14,0.87), rgba(10,6,14,0.87)), url('arc8.jpg');
+    background-size: cover; background-position: center;
+  }
 </style>
 </head>
 <body>
@@ -1668,17 +1707,8 @@
     <button class="btn-primary" onclick="startIntro()">Bắt Đầu Ngay</button>
     <button class="btn-continue" id="btn-continue" onclick="loadAndContinue()" style="display:none">Chơi Tiếp →</button>
   </div>
-  <!-- Silhouette SVG -->
-  <svg class="silhouette" viewBox="0 0 100 200" fill="currentColor">
-    <ellipse cx="50" cy="18" rx="12" ry="14" fill="currentColor"/>
-    <path d="M20 80 Q30 40 50 35 Q70 40 80 80 L85 160 Q70 170 50 172 Q30 170 15 160 Z" fill="currentColor"/>
-    <path d="M20 80 Q5 90 8 120 Q12 140 25 135 Q28 100 30 90" fill="currentColor"/>
-    <path d="M80 80 Q95 90 92 120 Q88 140 75 135 Q72 100 70 90" fill="currentColor"/>
-    <rect x="30" y="170" width="8" height="30" rx="4" fill="currentColor"/>
-    <rect x="62" y="170" width="8" height="30" rx="4" fill="currentColor"/>
-    <!-- Fan -->
-    <path d="M75 95 Q90 75 85 60 Q80 75 75 95Z" fill="currentColor" opacity="0.7"/>
-  </svg>
+  <!-- Gia Cát character art -->
+  <img class="silhouette" src="giac-bg.png" alt="Gia Cát Khổng Minh">
 </div>
 
 <!-- ===== ARC SELECT ===== -->
@@ -3831,6 +3861,7 @@ function showArcSelect() {
 
 function selectArc(arcNum) {
   state.selectedArc = arcNum;
+  document.body.setAttribute('data-arc', arcNum);
   // Reset game state for new arc
   state.S = 70; state.E = 70; state.C = 70; state.IP = 0;
   state.sitIndex = 0; state.goodCount = 0; state.badCount = 0; state.patterns = [];
@@ -4810,6 +4841,7 @@ function loadAndContinue() {
 
     // Restore state
     state.selectedArc = save.selectedArc;
+    document.body.setAttribute('data-arc', save.selectedArc);
     state.IP = save.IP;
     state.S = save.S;
     state.E = save.E;
