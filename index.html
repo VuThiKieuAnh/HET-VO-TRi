@@ -349,6 +349,7 @@
     color: var(--parchment);
     margin-bottom: 0.25rem;
     animation: fadeUp 0.5s ease both;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.6);
   }
 
   .situation-q {
@@ -401,7 +402,7 @@
   }
 
   .option-btn {
-    background: rgba(201,168,76,0.04);
+    background: rgba(10,8,6,0.55);
     border: 1px solid rgba(201,168,76,0.15);
     color: var(--parchment);
     font-family: 'Be Vietnam Pro', sans-serif;
@@ -1682,35 +1683,35 @@
      the situation screen, room summary, room review, mirror room and
      gate-fail screen — using the same artwork as the arc-select cards. */
   body[data-arc="1"] #game, body[data-arc="1"] #room-summary, body[data-arc="1"] #room-review, body[data-arc="1"] #result, body[data-arc="1"] #gameover {
-    background-image: linear-gradient(rgba(8,6,4,0.87), rgba(8,6,4,0.87)), url('arc1.jpg');
+    background-image: linear-gradient(rgba(8,6,4,0.68), rgba(8,6,4,0.68)), url('arc1.jpg');
     background-size: cover; background-position: center;
   }
   body[data-arc="2"] #game, body[data-arc="2"] #room-summary, body[data-arc="2"] #room-review, body[data-arc="2"] #result, body[data-arc="2"] #gameover {
-    background-image: linear-gradient(rgba(6,8,10,0.87), rgba(6,8,10,0.87)), url('arc2.jpg');
+    background-image: linear-gradient(rgba(6,8,10,0.68), rgba(6,8,10,0.68)), url('arc2.jpg');
     background-size: cover; background-position: center;
   }
   body[data-arc="3"] #game, body[data-arc="3"] #room-summary, body[data-arc="3"] #room-review, body[data-arc="3"] #result, body[data-arc="3"] #gameover {
-    background-image: linear-gradient(rgba(6,7,12,0.87), rgba(6,7,12,0.87)), url('arc3.jpg');
+    background-image: linear-gradient(rgba(6,7,12,0.68), rgba(6,7,12,0.68)), url('arc3.jpg');
     background-size: cover; background-position: center;
   }
   body[data-arc="4"] #game, body[data-arc="4"] #room-summary, body[data-arc="4"] #room-review, body[data-arc="4"] #result, body[data-arc="4"] #gameover {
-    background-image: linear-gradient(rgba(8,8,14,0.87), rgba(8,8,14,0.87)), url('arc4.jpg');
+    background-image: linear-gradient(rgba(8,8,14,0.68), rgba(8,8,14,0.68)), url('arc4.jpg');
     background-size: cover; background-position: center;
   }
   body[data-arc="5"] #game, body[data-arc="5"] #room-summary, body[data-arc="5"] #room-review, body[data-arc="5"] #result, body[data-arc="5"] #gameover {
-    background-image: linear-gradient(rgba(6,8,6,0.87), rgba(6,8,6,0.87)), url('arc5.jpg');
+    background-image: linear-gradient(rgba(6,8,6,0.68), rgba(6,8,6,0.68)), url('arc5.jpg');
     background-size: cover; background-position: center;
   }
   body[data-arc="6"] #game, body[data-arc="6"] #room-summary, body[data-arc="6"] #room-review, body[data-arc="6"] #result, body[data-arc="6"] #gameover {
-    background-image: linear-gradient(rgba(8,8,10,0.87), rgba(8,8,10,0.87)), url('arc6.jpg');
+    background-image: linear-gradient(rgba(8,8,10,0.68), rgba(8,8,10,0.68)), url('arc6.jpg');
     background-size: cover; background-position: center;
   }
   body[data-arc="7"] #game, body[data-arc="7"] #room-summary, body[data-arc="7"] #room-review, body[data-arc="7"] #result, body[data-arc="7"] #gameover {
-    background-image: linear-gradient(rgba(6,8,12,0.87), rgba(6,8,12,0.87)), url('arc7.jpg');
+    background-image: linear-gradient(rgba(6,8,12,0.68), rgba(6,8,12,0.68)), url('arc7.jpg');
     background-size: cover; background-position: center;
   }
   body[data-arc="8"] #game, body[data-arc="8"] #room-summary, body[data-arc="8"] #room-review, body[data-arc="8"] #result, body[data-arc="8"] #gameover {
-    background-image: linear-gradient(rgba(10,6,14,0.87), rgba(10,6,14,0.87)), url('arc8.jpg');
+    background-image: linear-gradient(rgba(10,6,14,0.68), rgba(10,6,14,0.68)), url('arc8.jpg');
     background-size: cover; background-position: center;
   }
 </style>
@@ -4224,11 +4225,11 @@ function nextSituation() {
 // ============================================================
 const LEVELS = [
   { lvl:1, min:0,   title:"Vô Tri Vô Đối",  quote:"Ngươi mới bắt đầu nhìn vào gương." },
-  { lvl:2, min:61,  title:"Siêu Vô Tri",    quote:"Ngươi đã thấy gì đó — nhưng vẫn còn nhiều thứ chưa dám nhìn thẳng vào." },
-  { lvl:3, min:121, title:"Vô Tri Hệ Nặng", quote:"Ngươi đang đi đúng hướng. Phần khó nhất không phải là bắt đầu — mà là tiếp tục." },
-  { lvl:4, min:211, title:"Vô Tri Ổn Định", quote:"Ngươi đã nhìn được nhiều thứ mà người khác còn chưa sẵn sàng thấy." },
-  { lvl:5, min:311, title:"Hơi Vô Tri",     quote:"Ít người đến được đây. Không phải vì họ không thể — mà vì họ không chọn." },
-  { lvl:6, min:391, title:"Hết Vô Tri",     quote:"Top 5–10% người chơi. Ngươi đã chọn sự thật đủ nhiều lần để nó trở thành thói quen." },
+  { lvl:2, min:70,  title:"Siêu Vô Tri",    quote:"Ngươi đã thấy gì đó — nhưng vẫn còn nhiều thứ chưa dám nhìn thẳng vào." },
+  { lvl:3, min:140, title:"Vô Tri Hệ Nặng", quote:"Ngươi đang đi đúng hướng. Phần khó nhất không phải là bắt đầu — mà là tiếp tục." },
+  { lvl:4, min:240, title:"Vô Tri Ổn Định", quote:"Ngươi đã nhìn được nhiều thứ mà người khác còn chưa sẵn sàng thấy." },
+  { lvl:5, min:355, title:"Hơi Vô Tri",     quote:"Ít người đến được đây. Không phải vì họ không thể — mà vì họ không chọn." },
+  { lvl:6, min:445, title:"Hết Vô Tri",     quote:"Top 5–10% người chơi. Ngươi đã chọn sự thật đủ nhiều lần để nó trở thành thói quen." },
 ];
 
 function getCurrentLevel(ip) {
@@ -4662,12 +4663,12 @@ function showResult() {
 // ============================================================
 function showReward() {
   const levels = [
-    { min:0,   max:60,  lvl:1, title:"Vô Tri Vô Đối",   quote:"Ngươi mới bắt đầu nhìn vào gương. Hầu hết mọi người chưa làm được bước này." },
-    { min:61,  max:120, lvl:2, title:"Siêu Vô Tri",     quote:"Ngươi đã thấy gì đó — nhưng vẫn còn nhiều thứ chưa dám nhìn thẳng vào." },
-    { min:121, max:210, lvl:3, title:"Vô Tri Hệ Nặng",  quote:"Ngươi đang đi đúng hướng. Phần khó nhất không phải là bắt đầu — mà là tiếp tục." },
-    { min:211, max:310, lvl:4, title:"Vô Tri Ổn Định",  quote:"Ngươi đã nhìn được nhiều thứ mà người khác còn chưa sẵn sàng thấy." },
-    { min:311, max:390, lvl:5, title:"Hơi Vô Tri",      quote:"Ít người đến được đây. Không phải vì họ không thể — mà vì họ không chọn." },
-    { min:391, max:9999,lvl:6, title:"Hết Vô Tri",      quote:"Top 5–10% người chơi. Ngươi đã chọn sự thật đủ nhiều lần để nó trở thành thói quen." },
+    { min:0,   max:69,  lvl:1, title:"Vô Tri Vô Đối",   quote:"Ngươi mới bắt đầu nhìn vào gương. Hầu hết mọi người chưa làm được bước này." },
+    { min:70,  max:139, lvl:2, title:"Siêu Vô Tri",     quote:"Ngươi đã thấy gì đó — nhưng vẫn còn nhiều thứ chưa dám nhìn thẳng vào." },
+    { min:140, max:239, lvl:3, title:"Vô Tri Hệ Nặng",  quote:"Ngươi đang đi đúng hướng. Phần khó nhất không phải là bắt đầu — mà là tiếp tục." },
+    { min:240, max:354, lvl:4, title:"Vô Tri Ổn Định",  quote:"Ngươi đã nhìn được nhiều thứ mà người khác còn chưa sẵn sàng thấy." },
+    { min:355, max:444, lvl:5, title:"Hơi Vô Tri",      quote:"Ít người đến được đây. Không phải vì họ không thể — mà vì họ không chọn." },
+    { min:445, max:9999,lvl:6, title:"Hết Vô Tri",      quote:"Top 5–10% người chơi. Ngươi đã chọn sự thật đủ nhiều lần để nó trở thành thói quen." },
   ];
 
   const cur = levels.find(l => state.IP >= l.min && state.IP <= l.max) || levels[0];
