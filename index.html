@@ -2784,8 +2784,8 @@ const situations = [
       g:"Giả vờ ổn để không phải đối mặt với ánh mắt thương hại — nhưng bạn ổn thật không?" },
     { id:"B", txt:"\"Mẹ ơi, chuyện đó con chưa kể vì con muốn tự giải quyết. Lần sau mẹ hỏi con trước được không?\"", type:"su_that_tu_te", pattern:"assertive", s:10, e:5, c:10, ip:10,
       g:"Đặt ranh giới một cách nhẹ nhàng và rõ ràng — ngay cả khi đang bị tổn thương. Đó không phải ai cũng làm được." },
-    { id:"C", txt:"\"Mẹ kể chuyện của con cho cả nhà nghe mà không hỏi con là không được đâu nhé.\" Giọng lạnh và rõ ràng.", type:"su_that_tu_te", pattern:"assertive", s:10, e:5, c:15, ip:10,
-      g:"Thẳng thắn và không nhún nhường — bạn đang bảo vệ ranh giới cá nhân. Dù vậy, bạn có để ý ánh mắt mẹ lúc bạn nói câu đó không?" }
+    { id:"C", txt:"\"Mẹ kể chuyện của con cho cả nhà nghe mà không hỏi con là không được đâu nhé.\" Giọng lạnh và rõ ràng.", type:"aggressive", pattern:"aggressive", s:-15, e:0, c:-5, ip:-10,
+      g:"Đúng về nguyên tắc, nhưng giọng lạnh đó sẽ khiến mẹ nghe thấy sự tấn công trước khi nghe thấy ranh giới. Bạn có để ý ánh mắt mẹ lúc bạn nói câu đó không?" }
   ]
 },
 { id:"A1_P2_05", room:2, sit_in_room:5, arc:1, arc_name:"Bữa cơm hay Buổi thẩm vấn?",
@@ -2807,7 +2807,7 @@ const situations = [
 
 // PHÒNG 1: NHỮNG CON SỐ BIẾT NÓI
 { id:"A2_P1_01", room:3, sit_in_room:1, arc:2, arc_name:"Tiếng vang của sự so sánh",
-  text:"Mẹ vừa đi họp phụ huynh về, ngồi xuống thở dài: \"Con Hà lớp mày học trường quốc tế, ba mẹ nó đều làm công ty nước ngoài. Mày học thêm tiếng Anh đi không cứ mãi thế này.\"",
+  text:"Mẹ vừa đi họp phụ huynh về, ngồi xuống thở dài: \"Hôm nay nghe mấy phụ huynh khác kể, con Hà con cô Lan học trường quốc tế, ba mẹ nó đều làm công ty nước ngoài. Mày học thêm tiếng Anh đi không cứ mãi thế này.\"",
   options:[
     { id:"A", txt:"\"Mẹ ơi con đang học rồi, nhưng con học theo tốc độ của con, không phải của con Hà.\"", type:"su_that_tu_te", pattern:"assertive", s:10, e:5, c:10, ip:10,
       g:"Giữ được lập trường mà không tấn công — tốt. Nhưng cái 'tốc độ của con' đó có thật không, hay chỉ là cách nói khéo cho sự trì hoãn?" },
@@ -2931,7 +2931,7 @@ const situations = [
       g:"Thành thật và sớm — đó là điều bạn có thể cho đi. Nhưng bạn có chắc 'họp quan trọng' này quan trọng hơn đứa bạn thân 10 năm không?" },
     { id:"B", txt:"Nói với sếp bị ốm, xin nghỉ họp. Đến đám cưới nhưng suốt ngày lo điện thoại rung.", type:"ne_tranh_chien_thuat", pattern:"cautious", s:0, e:-5, c:-10, ip:5,
       g:"Cố giữ cả hai nhưng không trọn vẹn cái nào — bạn có mặt ở đám cưới nhưng tâm trí đang ở cuộc họp." },
-    { id:"C", txt:"Nhắn: \"Tao đến nhé\" rồi vào phòng họp. Sau đó xin lỗi bảo kẹt xe.", type:"sid_dien_bao_bien", pattern:"defensive", s:-5, e:-10, c:-15, ip:5,
+    { id:"C", txt:"Nhắn: \"Tao đến nhé\" rồi vào phòng họp. Sau đó xin lỗi bảo chuyến bay bị hoãn đột xuất.", type:"sid_dien_bao_bien", pattern:"defensive", s:-5, e:-10, c:-15, ip:5,
       g:"Lời nói dối để trốn tránh một quyết định khó — bạn không chọn công ty hay bạn bè, bạn chọn không chịu trách nhiệm." }
   ]
 },
@@ -2982,9 +2982,9 @@ const situations = [
 
 // PHÒNG 2: KHI LỜI HỨA TRỞ THÀNH SỰ THAO TÚNG
 { id:"A3_P2_01", room:6, sit_in_room:1, arc:3, arc_name:"Vòng lặp của những lời hứa hão",
-  text:"Bạn hứa về ăn cơm tối với vợ/chồng nhưng lại bị bạn bè rủ đi nhậu. Bạn không từ chối được nên nhắn tin: \"Anh/Em bị hỏng xe, chắc về muộn, mọi người ăn trước đi.\"",
+  text:"Bạn hứa về ăn cơm tối với vợ/chồng nhưng lại bị bạn bè rủ đi nhậu. Bạn đang phân vân nên nhắn tin báo thế nào.",
   options:[
-    { id:"A", txt:"Về nhà mùi rượu nồng rồi tiếp tục kể chuyện hỏng xe, thêm chi tiết cho có vẻ thật.", type:"sid_dien_bao_bien", pattern:"defensive", s:-5, e:-10, c:-20, ip:5,
+    { id:"A", txt:"Nhắn: \"Anh/Em bị hỏng xe, chắc về muộn, mọi người ăn trước đi.\" Về nhà mùi rượu nồng rồi tiếp tục kể chuyện hỏng xe, thêm chi tiết cho có vẻ thật.", type:"sid_dien_bao_bien", pattern:"defensive", s:-5, e:-10, c:-20, ip:5,
       g:"Lời nói dối leo thang — mỗi chi tiết thêm vào là một viên gạch xây tường ngăn cách." },
     { id:"B", txt:"\"Hôm nay vui quá không từ chối được, xin lỗi nhé, mai anh/em bù.\"", type:"sid_dien_bao_bien", pattern:"people_pleaser", s:-5, e:-10, c:-10, ip:5,
       g:"Bạn sợ mất lòng bạn bè nhưng không sợ mất lòng người đầu ấp tay gối — ưu tiên của bạn đang nói lên điều gì?" },
@@ -3633,8 +3633,8 @@ const situations = [
       g:"Bạn đang trở thành nguồn thông tin riêng tư của họ — tiện cho họ, mệt cho bạn, team vẫn không có thông tin." },
     { id:"B", txt:"Trả lời rồi gợi ý: \"Câu hỏi hay đó, mày muốn post lên channel chung không? Để mọi người cùng biết.\"", type:"su_that_tu_te", pattern:"assertive", s:10, e:5, c:10, ip:10,
       g:"Chia sẻ thông tin với cả team mà không làm họ khó xử — và dần dần thay đổi thói quen." },
-    { id:"C", txt:"\"Câu này mày hỏi trên channel chung đi, tao không trả lời chat riêng chuyện công việc.\"", type:"su_that_tu_te", pattern:"assertive", s:10, e:5, c:10, ip:10,
-      g:"Thẳng thắn về kỳ vọng — có thể hơi cứng ban đầu nhưng rõ ràng và nhất quán." }
+    { id:"C", txt:"\"Câu này mày hỏi trên channel chung đi, tao không trả lời chat riêng chuyện công việc.\"", type:"aggressive", pattern:"aggressive", s:-10, e:5, c:-5, ip:-5,
+      g:"Đúng nguyên tắc nhưng cộc — dễ khiến đồng nghiệp cảm thấy bị từ chối hơn là được hướng dẫn. Cùng một ranh giới, cách nói khác đi có thể giữ được cả hai điều." }
   ]
 },
 { id:"A7_P2_X2", room:14, sit_in_room:7, arc:7, arc_name:"Công sở & áp lực ngầm",
