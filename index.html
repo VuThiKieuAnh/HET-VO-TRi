@@ -555,6 +555,18 @@
     margin-bottom: 0.75rem;
   }
 
+  .mirror-arc-complete {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--parchment);
+    background: rgba(212, 175, 55, 0.12);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 999px;
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    margin-bottom: 1rem;
+  }
+
   .mirror-title {
     font-family: 'Noto Serif', serif;
     font-size: clamp(1.5rem, 5vw, 2.2rem);
@@ -2015,6 +2027,7 @@
   <div class="mirror-wrap">
     <div class="mirror-header">
       <div class="mirror-eyebrow">Phòng Gương</div>
+      <div class="mirror-arc-complete" id="mirror-arc-complete"></div>
       <h2 class="mirror-title">Ta đã quan sát<br>ngươi đủ rồi.</h2>
       <div class="mirror-divider"></div>
     </div>
@@ -2807,7 +2820,7 @@ const situations = [
 
 // PHÒNG 1: NHỮNG CON SỐ BIẾT NÓI
 { id:"A2_P1_01", room:3, sit_in_room:1, arc:2, arc_name:"Tiếng vang của sự so sánh",
-  text:"Mẹ vừa đi họp phụ huynh về, ngồi xuống thở dài: \"Hôm nay nghe mấy phụ huynh khác kể, con Hà con cô Lan học trường quốc tế, ba mẹ nó đều làm công ty nước ngoài. Mày học thêm tiếng Anh đi không cứ mãi thế này.\"",
+  text:"Mẹ vừa đi ăn giỗ họ về, ngồi xuống thở dài: \"Hôm nay nghe bác Lan khoe con Hà học trường quốc tế, ba mẹ nó đều làm công ty nước ngoài. Mày học thêm tiếng Anh đi không cứ mãi thế này.\"",
   options:[
     { id:"A", txt:"\"Mẹ ơi con đang học rồi, nhưng con học theo tốc độ của con, không phải của con Hà.\"", type:"su_that_tu_te", pattern:"assertive", s:10, e:5, c:10, ip:10,
       g:"Giữ được lập trường mà không tấn công — tốt. Nhưng cái 'tốc độ của con' đó có thật không, hay chỉ là cách nói khéo cho sự trì hoãn?" },
@@ -2820,10 +2833,10 @@ const situations = [
 { id:"A2_P1_02", room:3, sit_in_room:2, arc:2, arc_name:"Tiếng vang của sự so sánh",
   text:"Sếp gọi bạn vào phòng: \"Em thấy anh Tuấn cùng phòng không? Anh ấy vào sau em 1 năm mà dự án nào cũng chủ động xung phong. Em cần chủ động hơn.\"",
   options:[
-    { id:"A", txt:"\"Dạ em hiểu. Sếp có thể cho em biết cụ thể em cần chủ động ở điểm nào không?\"", type:"su_that_tu_te", pattern:"growth_oriented", s:10, e:5, c:10, ip:10,
-      g:"Hỏi để hiểu thay vì phòng thủ — đó là tư duy phát triển thật sự. Hay bạn hỏi để bẫy sếp vào thế không trả lời được?" },
-    { id:"B", txt:"\"Dạ vâng sếp, em sẽ cố gắng hơn ạ.\" Rồi ra ngoài ngồi nghĩ xem anh Tuấn ấy có gì mà mình không có.", type:"ne_tranh_hen_nhat", pattern:"avoidant", s:-5, e:-10, c:-10, ip:-5,
-      g:"Gật đầu bên ngoài, đố kỵ bên trong — hai thứ đó cùng tồn tại sẽ dẫn bạn đi đâu?" },
+    { id:"A", txt:"\"Dạ em hiểu rồi ạ. Sếp có dự án nào sắp tới không, em xin chủ động xung phong.\"", type:"su_that_tu_te", pattern:"growth_oriented", s:10, e:5, c:10, ip:10,
+      g:"Biến lời nhắc nhở thành hành động cụ thể ngay — đó là tư duy phát triển thật sự. Hay bạn nói vậy chỉ để sếp thấy bạn có phản ứng?" },
+    { id:"B", txt:"\"Dạ vâng sếp, em sẽ cố gắng hơn ạ.\" Về bàn ngồi ấm ức, nghĩ chắc sếp đang thiên vị anh Tuấn.", type:"ne_tranh_hen_nhat", pattern:"avoidant", s:-5, e:-10, c:-10, ip:-5,
+      g:"Gật đầu ngoài mặt, ấm ức trong lòng — đồng ý bằng miệng không phải là đồng ý thật." },
     { id:"C", txt:"\"Dạ, nhưng anh Tuấn và em có phong cách làm việc khác nhau sếp ơi. Em không thể copy cách của anh ấy.\"", type:"sid_dien_bao_bien", pattern:"defensive", s:-5, e:-10, c:-10, ip:5,
       g:"Đúng là không cần copy — nhưng bạn đang giải thích sự khác biệt hay đang biện hộ cho việc không chịu thay đổi?" }
   ]
@@ -4201,7 +4214,13 @@ function showFeedback(opt, timedOut) {
 function nextSituation() {
   state.sitIndex++;
   if (state.sitIndex >= activeSituations.length) {
-    showResult();
+    const prevRoom = activeSituations[state.sitIndex - 1].room;
+    // Clear game screen trước khi chuyển — không để tình huống cũ lộ ra
+    document.getElementById('sit-text').textContent = '';
+    document.getElementById('options').innerHTML = '';
+    document.getElementById('feedback-area').innerHTML = '';
+    document.querySelector('.timer-wrap').style.opacity = '0';
+    showRoomSummary(prevRoom, null);
   } else {
     const currentRoom = activeSituations[state.sitIndex] ? activeSituations[state.sitIndex].room : 0;
     const prevRoom = activeSituations[state.sitIndex - 1].room;
@@ -4380,6 +4399,18 @@ function showRoomSummary(doneRoom, nextRoom) {
       if (arcPass) {
         gateEl.textContent = '';
         gateEl.className = 'rsummary-gate-msg';
+        const arcNames = {
+          1: 'Arc I · Bữa Cơm Hay Buổi Thẩm Vấn?',
+          2: 'Arc II · Tiếng Vang Của Sự So Sánh',
+          3: 'Arc III · Vòng Lặp Của Những Lời Hứa Hão',
+          4: 'Arc IV · Vỡ Mộng Sau Trăng Mật',
+          5: 'Arc V · Tình Bạn & Ranh Giới',
+          6: 'Arc VI · Tiền Bạc & Lòng Tự Trọng',
+          7: 'Arc VII · Công Sở & Áp Lực Ngầm',
+          8: 'Arc VIII · Mạng Xã Hội & Hình Ảnh Bản Thân',
+        };
+        document.getElementById('rsummary-room-label').textContent = `${arcNames[playingArc] || 'Arc ' + playingArc} — Hoàn Thành!`;
+        document.getElementById('rsummary-title').textContent = 'Ngươi đã đi hết arc này rồi.';
         btn.textContent = 'Xem Phòng Gương →';
         btn.onclick = () => showResult();
       } else {
@@ -4648,6 +4679,21 @@ function showResult() {
   const arcTexts = arcMirror[currentArc] || arcMirror[1];
   const giacText = arcTexts[mirrorKey] || arcTexts['avoidant'];
   const label = patternLabel[topPattern] || "Kẻ Né Tránh";
+
+  const arcNamesShort = {
+    1: 'Arc I · Bữa Cơm Hay Buổi Thẩm Vấn?',
+    2: 'Arc II · Tiếng Vang Của Sự So Sánh',
+    3: 'Arc III · Vòng Lặp Của Những Lời Hứa Hão',
+    4: 'Arc IV · Vỡ Mộng Sau Trăng Mật',
+    5: 'Arc V · Tình Bạn & Ranh Giới',
+    6: 'Arc VI · Tiền Bạc & Lòng Tự Trọng',
+    7: 'Arc VII · Công Sở & Áp Lực Ngầm',
+    8: 'Arc VIII · Mạng Xã Hội & Hình Ảnh Bản Thân',
+  };
+  const arcCompleteEl = document.getElementById('mirror-arc-complete');
+  if (arcCompleteEl) {
+    arcCompleteEl.textContent = `${arcNamesShort[currentArc] || 'Arc ' + currentArc} — Hoàn Thành!`;
+  }
 
   document.getElementById('res-ip').textContent = state.IP;
   document.getElementById('res-good').textContent = state.goodCount;
